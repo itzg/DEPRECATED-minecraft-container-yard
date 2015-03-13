@@ -1,10 +1,12 @@
 
-angular.module('mccyControllers', [])
+angular.module('mccyControllers', [
+    'mccyServices'
+])
     .controller('OuterCtrl', function ($scope) {
 
     })
 
-    .controller('StartCtrl', function ($scope, $http) {
-
+    .controller('ServersCtrl', function ($scope, mccyServersResource) {
+        $scope.servers = mccyServersResource.getAll();
     })
 ;

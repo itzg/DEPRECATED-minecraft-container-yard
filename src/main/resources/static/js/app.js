@@ -1,14 +1,15 @@
 angular.module('mccyApp', [
     'ngRoute',
-    'mccyControllers'
+    'mccyControllers',
+    'mccyServices'
 ])
     .config(function ($routeProvider) {
         $routeProvider
-            .when('/start', {
-                templateUrl: 'views/start.html',
-                controller: 'StartCtrl'
+            .when('/servers', {
+                templateUrl: 'views/servers.html',
+                controller: 'ServersCtrl'
             })
             .otherwise({
-                redirectTo: '/start'
+                redirectTo: '/servers'
             });
     });
