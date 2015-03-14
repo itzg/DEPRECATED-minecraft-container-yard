@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Manages Docker (daemon) hosts.
@@ -42,7 +43,16 @@ public class HostsService {
     }
 
     public Collection<DockerHost> getAll() {
-        return datastoreService.getAll();
+        return getAll(null);
+    }
+
+    /**
+     * Get all hosts (or a specified subset of them)
+     * @param hostIds if null, get all hosts, otherwise, specifies a subset of daemon IDs
+     * @return
+     */
+    public Collection<DockerHost> getAll(List<String> hostIds) {
+        return datastoreService.getAll(hostIds);
     }
 
     public DockerHost create(HostAndPort address) throws MccyException {

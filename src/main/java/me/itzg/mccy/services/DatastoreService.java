@@ -10,8 +10,10 @@ import me.itzg.mccy.model.Index;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.IdsQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,11 +56,28 @@ public class DatastoreService {
         }
     }
 
-    public Collection<DockerHost> getAll() {
-        final SearchResponse searchResponse = esClient.prepareSearch()
-                .setIndices(Index.NAME)
-                .setTypes(DockerHost.TYPE)
-                .get();
+    public Collection<DockerHost> getAll(List<String> hostIds) {
+        final SearchRequestBuilder searchBuilder = esClient.prepareSearch()
+                .setIndices(Index.NAME);
+
+        if (hostIds != null) {
+            LOG.debug("List of host IDs was provided: {}", hostIds);
+            if (hostIds.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            final IdsQueryBuilder queryBuilder = QueryBuilders.idsQuery(DockerHost.TYPE);
+            for (String hostId : hostIds) {
+                queryBuilder.addIds(hostId);
+            }
+            searchBuilder.setQuery(queryBuilder);
+        }
+        else {
+            searchBuilder.setTypes(DockerHost.TYPE);
+        }
+
+        LOG.trace("Searching with {}", searchBuilder);
+        final SearchResponse searchResponse = searchBuilder.get();
 
         final SearchHit[] hits = searchResponse.getHits().getHits();
 

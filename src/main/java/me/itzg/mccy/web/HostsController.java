@@ -4,7 +4,9 @@ import com.google.common.net.HostAndPort;
 import me.itzg.mccy.MccyClientException;
 import me.itzg.mccy.MccyException;
 import me.itzg.mccy.model.DockerHost;
+import me.itzg.mccy.model.MinecraftServer;
 import me.itzg.mccy.services.HostsService;
+import me.itzg.mccy.services.MinecraftServersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 /**
@@ -29,6 +30,9 @@ public class HostsController {
     @Autowired
     private HostsService hostsService;
 
+    @Autowired
+    private MinecraftServersService serversService;
+
     @RequestMapping(method = RequestMethod.GET)
     public Collection<DockerHost> getAll() {
         return hostsService.getAll();
@@ -39,9 +43,9 @@ public class HostsController {
         return hostsService.create(HostAndPort.fromString(hostAndPort));
     }
 
-    @RequestMapping(value = "/{nameOrId}", method = RequestMethod.GET)
-    public ResponseEntity<DockerHost> getHost(@PathVariable String nameOrId) throws MccyException {
-        final DockerHost dockerHost = hostsService.get(nameOrId);
+    @RequestMapping(value = "/{idOrName}", method = RequestMethod.GET)
+    public ResponseEntity<DockerHost> getHost(@PathVariable String idOrName) throws MccyException {
+        final DockerHost dockerHost = hostsService.get(idOrName);
         if (dockerHost != null) {
             return new ResponseEntity<>(dockerHost, HttpStatus.OK);
         }
@@ -50,9 +54,9 @@ public class HostsController {
         }
     }
 
-    @RequestMapping(value = "/{nameOrId}", method = RequestMethod.PUT)
-    public void set(@PathVariable String nameOrId, @RequestBody DockerHost dockerHost) throws MccyException {
-        hostsService.update(nameOrId, dockerHost);
+    @RequestMapping(value = "/{idOrName}", method = RequestMethod.PUT)
+    public void set(@PathVariable String idOrName, @RequestBody DockerHost dockerHost) throws MccyException {
+        hostsService.update(idOrName, dockerHost);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -65,9 +69,15 @@ public class HostsController {
         }
     }
 
-    @RequestMapping(value = "/{namedOrId}/servers")
-    public Collection<DockerHost> getServersOnHost(@PathVariable String nameOrId) {
-        //TODO
-        return null;
+    @RequestMapping(value = "/{idOrName}/servers")
+    public ResponseEntity<Collection<MinecraftServer>> getServersOnHost(@PathVariable String idOrName) throws MccyException {
+        final DockerHost dockerHost = hostsService.get(idOrName);
+        if (dockerHost != null) {
+            final Collection<MinecraftServer> serversOnHost = serversService.getServersOnHost(dockerHost, true);
+            return new ResponseEntity<Collection<MinecraftServer>>(serversOnHost, HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<Collection<MinecraftServer>>(HttpStatus.NOT_FOUND);
+        }
     }
 }
