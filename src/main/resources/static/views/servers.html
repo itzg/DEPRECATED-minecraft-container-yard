@@ -1,5 +1,58 @@
 <div id="servers" class="main">
     <div class="row">
-        <div class="col-lg-6" ng-repeat=""></div>
+
+        <div class="col-md-3">
+            <div class="panel panel-default" ng-controller="HostsController">
+                <div class="panel-heading">Docker Hosts</div>
+                <div class="panel-body">
+                    <div ng-repeat="host in hosts">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="host.selected">
+                                {{host.name}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">Servers</div>
+                <div class="panel-body">
+                    <div class="row" ng-repeat="server in servers">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">{{server.containerName}}</div>
+                                <div class="panel-body">
+                                    <table class="properties">
+                                        <tr>
+                                            <th>Port</th>
+                                            <td>{{server.exposedPort}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Requested Version</th>
+                                            <td>{{server.requestedVersion}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Type</th>
+                                            <td>{{server.type}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Ops</th>
+                                            <td><ul>
+                                                <li ng-repeat="op in server.originalOps">{{op}}</li>
+                                            </ul></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

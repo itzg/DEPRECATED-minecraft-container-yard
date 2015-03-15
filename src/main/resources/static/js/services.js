@@ -1,20 +1,28 @@
 angular.module('mccyServices', [
     'ngResource'
 ])
-    .service('mccyServersResource', function($resource) {
-        return $resource('/servers/:name', {}, {
+    .service('Servers', function($resource) {
+        return $resource('/servers/:id', {
+        }, {
             getAll: {
                 method: 'GET',
-                params: {}
+                isArray: true,
+                params: {
+                    details: true
+                },
+                url: '/servers'
             }
         })
     })
-    .service('mccyServers', function(mccyServersResource) {
-        // The service interface
-        return {
-            getAll: function() {
 
+    .service('Hosts', function($resource){
+        return $resource('/hosts/:idOrName', {}, {
+            getAll: {
+                method: 'GET',
+                params: {},
+                isArray: true
             }
-        }
+        })
     })
+
 ;

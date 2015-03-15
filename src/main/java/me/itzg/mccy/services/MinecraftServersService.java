@@ -68,11 +68,19 @@ public class MinecraftServersService {
         return HostAndPort.fromParts(dockerHost.getIpAddr(), dockerHost.getTcpPort());
     }
 
-    public Collection<MinecraftServer> getServersOnHosts(Collection<DockerHost> dockerHosts, final boolean allContainers) {
+    public Collection<MinecraftServer> getServersOnHosts(Collection<DockerHost> dockerHosts, boolean withDetails, final boolean allContainers) throws MccyException {
         List<MinecraftServer> servers = new ArrayList<>();
 
         for (DockerHost dockerHost : dockerHosts) {
-            servers.addAll(getServersOnHost(dockerHost, allContainers));
+            final Collection<MinecraftServer> summaries = getServersOnHost(dockerHost, allContainers);
+            if (!withDetails) {
+                servers.addAll(summaries);
+            }
+            else {
+                for (MinecraftServer summary : summaries) {
+                    servers.add(getDetails(dockerHost, summary.getId()));
+                }
+            }
         }
 
         return servers;

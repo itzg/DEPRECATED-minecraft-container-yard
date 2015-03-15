@@ -12,14 +12,38 @@
     <script src="webjars/bootstrap/3.3.2-1/js/bootstrap.min.js"></script>
     <script src="webjars/angularjs/1.3.14/angular.min.js"></script>
     <script src="webjars/angularjs/1.3.14/angular-route.min.js"></script>
+    <script src="webjars/angularjs/1.3.14/angular-resource.min.js"></script>
+    <script src="webjars/angular-ui-bootstrap/0.12.1-1/ui-bootstrap-tpls.min.js"></script>
+    <script src="webjars/angular-ui-bootstrap/0.12.1-1/ui-bootstrap.min.js"></script>
 
-    <script src="js/app.js"></script>
     <script src="js/services.js"></script>
     <script src="js/controllers.js"></script>
+    <script src="js/app.js"></script>
 </head>
-<body ng-controller="OuterCtrl">
-<div class="container-fluid">
-    <h1>Minecraft Container Yard</h1>
+<body ng-controller="OuterController">
+<div class="container">
+    <nav ng-controller="NavController" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" ng-click="isCollapsed = !isCollapsed">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#/">MCCY</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="navbar-collapse" ng-class="isCollapsed ? 'collapse' : 'in'">
+                <ul class="nav navbar-nav">
+                    <li ng-class="getClass('/servers')"><a href="#/servers">Servers</a></li>
+                    <li ng-class="getClass('/mods')"><a href="#/mods">Mods</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
     <div ng-view></div>
 

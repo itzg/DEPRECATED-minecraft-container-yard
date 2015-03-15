@@ -7,9 +7,16 @@ angular.module('mccyApp', [
         $routeProvider
             .when('/servers', {
                 templateUrl: 'views/servers.html',
-                controller: 'ServersCtrl'
+                controller: 'ServersController'
+            })
+            .when('/mods', {
+                templateUrl: 'views/mods.html',
+                controller: 'ModsController'
+            })
+            .when('/', {
+                templateUrl: 'views/start.html'
             })
             .otherwise({
-                redirectTo: '/servers'
+                redirectTo: '/'
             });
     });
