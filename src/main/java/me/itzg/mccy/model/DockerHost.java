@@ -1,5 +1,7 @@
 package me.itzg.mccy.model;
 
+import org.springframework.core.style.ToStringCreator;
+
 /**
  * @author Geoff Bourne
  * @since 3/7/2015
@@ -12,6 +14,16 @@ public class DockerHost {
     private String ipAddr;
     private int tcpPort;
     private String dockerDaemonId;
+
+    @Override
+    public String toString() {
+        return new ToStringCreator(this)
+                .append("dockerDaemonId", dockerDaemonId)
+                .append("name", name)
+                .append("ipAddr", ipAddr)
+                .append("tcpPort", tcpPort)
+                .toString();
+    }
 
     public String getName() {
         return name;

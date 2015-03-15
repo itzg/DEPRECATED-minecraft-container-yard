@@ -6,11 +6,14 @@ import me.itzg.mccy.MccyClientException;
 import me.itzg.mccy.MccyConstants;
 import me.itzg.mccy.MccyException;
 import me.itzg.mccy.model.DockerHost;
+import org.elasticsearch.indices.IndexMissingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.List;
 
@@ -58,16 +61,21 @@ public class HostsService {
     public DockerHost create(HostAndPort address) throws MccyException {
         final InfoResponse infoResponse = dockerClientService.getInfo(address);
 
-        DockerHost host = datastoreService.getHostById(infoResponse.getID());
-        if (host != null) {
-            LOG.debug("Host at {} already existed by ID: {}", address, host);
-            return host;
-        }
+        DockerHost host = null;
+        try {
+            host = datastoreService.getHostById(infoResponse.getID());
+            if (host != null) {
+                LOG.warn("Host at {} already existed by ID: {}", address, host);
+                return host;
+            }
 
-        host = datastoreService.getHostByName(infoResponse.getName());
-        if (host != null) {
-            LOG.debug("Host at {} already existed by name: {}", address, host);
-            return host;
+            host = datastoreService.getHostByName(infoResponse.getName());
+            if (host != null) {
+                LOG.warn("Host at {} already existed by name: {}", address, host);
+                return host;
+            }
+        } catch (IndexMissingException e) {
+            LOG.info("Index didn't exist, so proceeding to create");
         }
 
         // Didn't exist, create it
@@ -78,6 +86,7 @@ public class HostsService {
         host.setName(infoResponse.getName());
         host.setDockerDaemonId(infoResponse.getID());
 
+        LOG.info("Registered Docker host: {}", host);
         datastoreService.store(host);
 
         return host;
