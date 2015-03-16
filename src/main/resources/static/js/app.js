@@ -1,5 +1,6 @@
 angular.module('mccyApp', [
     'ngRoute',
+    'ui.bootstrap',
     'mccyControllers',
     'mccyServices'
 ])
@@ -7,11 +8,11 @@ angular.module('mccyApp', [
         $routeProvider
             .when('/servers', {
                 templateUrl: 'views/servers.html',
-                controller: 'ServersController'
+                controller: 'ServersViewController'
             })
             .when('/mods', {
                 templateUrl: 'views/mods.html',
-                controller: 'ModsController'
+                controller: 'ModsViewController'
             })
             .when('/', {
                 templateUrl: 'views/start.html'

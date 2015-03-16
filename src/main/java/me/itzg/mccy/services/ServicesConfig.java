@@ -4,7 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * General configuration/bean setup for the services.
@@ -18,6 +26,22 @@ public class ServicesConfig {
     @Bean @Qualifier("docker")
     public RestTemplate dockerRestTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean @Qualifier("json")
+    public RestTemplate jsonOnlyRestTemplate() {
+        // force it to ignore MediaType
+        final MappingJackson2HttpMessageConverter httpMessageConverter = new MappingJackson2HttpMessageConverter(objectMapper()) {
+            @Override
+            protected boolean canRead(MediaType mediaType) {
+                return true;
+            }
+        };
+
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        messageConverters.add(httpMessageConverter);
+
+        return new RestTemplate(messageConverters);
     }
 
     @Bean

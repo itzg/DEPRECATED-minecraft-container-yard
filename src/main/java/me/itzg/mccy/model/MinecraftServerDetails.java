@@ -1,5 +1,7 @@
 package me.itzg.mccy.model;
 
+import me.itzg.mccy.docker.ContainerStatus;
+
 import java.util.List;
 
 /**
@@ -12,6 +14,8 @@ public class MinecraftServerDetails extends MinecraftServer {
     private String containerName;
 
     private Integer exposedPort;
+
+    private ContainerStatus containerStatus;
 
     private String requestedVersion;
 
@@ -117,4 +121,11 @@ public class MinecraftServerDetails extends MinecraftServer {
         this.exposedPort = exposedPort;
     }
 
+    public ContainerStatus getContainerStatus() {
+        return containerStatus;
+    }
+
+    public void setContainerStatus(ContainerStatus containerStatus) {
+        this.containerStatus = containerStatus;
+    }
 }

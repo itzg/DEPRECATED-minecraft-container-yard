@@ -10,6 +10,7 @@ import me.itzg.mccy.MccyClientException;
 import me.itzg.mccy.MccyConstants;
 import me.itzg.mccy.MccyException;
 import me.itzg.mccy.MccyServerException;
+import me.itzg.mccy.docker.ContainerStatus;
 import me.itzg.mccy.docker.ContainersOptions;
 import me.itzg.mccy.docker.ImageReference;
 import me.itzg.mccy.model.DockerHost;
@@ -92,6 +93,7 @@ public class MinecraftServersService {
         MinecraftServerDetails details = new MinecraftServerDetails();
         details.setDockerDaemonId(dockerHost.getDockerDaemonId());
         details.setId(response.getId());
+        details.setContainerStatus(ContainerStatus.fromContainerInspect(response.getState()));
 
         details.setContainerName(extractContainerName(response));
         details.setExposedPort(extractExposedPort(response));

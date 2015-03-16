@@ -4,4 +4,15 @@
     <p>
         Get started by going to one of the sections above...like <a href="#/servers">Servers</a>.
     </p>
+
+    <p>
+        If you're having trouble connecting to your Docker hosts, then make sure you have
+        configured the daemon for remote socket access. For example, on Ubuntu, modify
+        <code>/etc/default/docker</code> to declare something like this:
+    </p>
+
+    <pre>
+DOCKER_OPTS="\
+ -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375 "
+    </pre>
 </div>

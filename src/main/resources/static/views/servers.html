@@ -8,7 +8,7 @@
                     <div ng-repeat="host in hosts">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" ng-model="host.selected">
+                                <input type="checkbox" ng-model="host.selected" ng-change="handleHostSelectionChange()">
                                 {{host.name}}
                             </label>
                         </div>
@@ -18,40 +18,39 @@
         </div>
 
         <div class="col-md-9">
-            <div class="panel panel-default">
-                <div class="panel-heading">Servers</div>
-                <div class="panel-body">
-                    <div class="row" ng-repeat="server in servers">
-                        <div class="col-md-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">{{server.containerName}}</div>
-                                <div class="panel-body">
-                                    <table class="properties">
-                                        <tr>
-                                            <th>Port</th>
-                                            <td>{{server.exposedPort}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Requested Version</th>
-                                            <td>{{server.requestedVersion}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Type</th>
-                                            <td>{{server.type}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Ops</th>
-                                            <td><ul>
-                                                <li ng-repeat="op in server.originalOps">{{op}}</li>
-                                            </ul></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
+            <div class="panel panel-default" ng-controller="ServersController">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-8">Servers</div>
 
+                        <div class="col-md-4 align-right">
+                            <button type="button" class="btn btn-info btn-sm" ng-click="refresh()">
+                                <span class="glyphicon glyphicon-refresh"/>
+                            </button>
+                            <button type="button" class="btn btn-info btn-sm"
+                                    ng-class="{active:managing}" ng-click="managing = !managing">
+                                <span class="glyphicon glyphicon-pencil"/>
+                                Manage
+                            </button>
                         </div>
                     </div>
                 </div>
+                <div class="panel-body">
+                    <div class="row management" ng-show="managing">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-primary" ng-click="createServer()">
+                                <span class="glyphicon glyphicon-plus"/>
+                                Create a Server
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-repeat="server in servers">
+                        <ng-include src="'bits/server-entry.html'"/>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
