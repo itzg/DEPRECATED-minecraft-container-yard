@@ -89,31 +89,40 @@ angular.module('mccyControllers', [
     })
 
     .controller('CreateServerController', function($scope, $modalInstance, Versions, Hosts){
-        $scope.$watch('type', getVersions);
 
-        $scope.hostId = '';
+        $scope.versionMode = 'LATEST';
+        $scope.spec = {
+            hostId: '',
+            name: '',
+            port: 25565,
+            version: 'LATEST',
+            type: 'VANILLA',
+            motd: '',
+            serverIcon: null,
+            levelSeed: null
+        };
+
         $scope.hosts = Hosts.getAll(function(response) {
             if (angular.isArray(response)) {
                 if (response.length == 1) {
-                    $scope.hostId = response[0].dockerDaemonId;
+                    $scope.spec.hostId = response[0].dockerDaemonId;
                 }
             }
         });
-        $scope.name = '';
-        $scope.port = 25565;
-        $scope.type = 'VANILLA';
-        $scope.version = '';
-        $scope.motd = null;
-        $scope.serverIcon = null;
 
-        $scope.levelSeed = null;
+        $scope.versions = Versions.getAll({
+            type: 'vanilla',
+            release: 'STABLE'
+        }, function(data){
+            console.log("Got", data);
+        });
 
-        function getVersions(type) {
-            $scope.versions = Versions.getAll({
-                type: 'vanilla',
-                release: type.indexOf('_SNAPSHOTS') >= 0 ? 'SNAPSHOT' : 'STABLE'
-            });
-        }
+        $scope.$watch('versionMode', function(newValue) {
+            if (newValue != 'SPECIFIC') {
+                $scope.spec.version = newValue;
+            }
+        });
+
     })
 
     .controller('ModsViewController', function ($scope) {

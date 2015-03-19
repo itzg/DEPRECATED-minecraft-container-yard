@@ -3,13 +3,13 @@
     <h4 class="modal-title">Create a Minecraft Server</h4>
 </div>
 <div class="modal-body">
-    <form class="form-horizontal" show-validation>
+    <form name="createServer" class="form-horizontal" show-validation>
 
         <div class="form-group">
             <label for="inputHost" class="col-sm-3 control-label">Docker Host</label>
             <div class="col-sm-9">
                 <select class="form-control" id="inputHost" required
-                        ng-model="hostId" ng-options="h.dockerDaemonId as h.name for h in hosts"/>
+                        ng-model="spec.hostId" ng-options="h.dockerDaemonId as h.name for h in hosts"/>
             </div>
         </div>
 
@@ -17,7 +17,7 @@
             <label for="inputContainerName" class="col-sm-3 control-label">Container Name</label>
             <div class="col-sm-9">
                 <input type="text"
-                       ng-model="name" required="true" ng-minlength="1"
+                       ng-model="spec.name" required="true" ng-minlength="1"
                        class="form-control" id="inputContainerName" placeholder="Name">
             </div>
         </div>
@@ -26,7 +26,7 @@
             <label for="inputPort" class="col-sm-3 control-label">Port</label>
             <div class="col-sm-9">
                 <input type="number"
-                       ng-model="port" required="true" pattern="[0-9]+"
+                       ng-model="spec.port" required="true" pattern="[0-9]+"
                        class="form-control" id="inputPort" placeholder="25565">
             </div>
         </div>
@@ -35,13 +35,10 @@
             <label class="col-sm-3 control-label">Type</label>
             <div class="col-sm-9">
                 <label class="radio-inline">
-                    <input type="radio" ng-model="type" id="typeVanilla" value="VANILLA"> Vanilla
+                    <input type="radio" ng-model="spec.type" id="typeVanilla" value="VANILLA"> Vanilla
                 </label>
                 <label class="radio-inline">
-                    <input type="radio" ng-model="type" id="typeVanillaSnapshot" value="VANILLA_SNAPSHOTS"> Snapshots
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" ng-model="type" id="typeForge" value="FORGE"> Forge
+                    <input type="radio" ng-model="spec.type" id="typeForge" value="FORGE"> Forge
                 </label>
             </div>
         </div>
@@ -49,8 +46,17 @@
         <div class="form-group">
             <label class="col-sm-3 control-label">Version</label>
             <div class="col-sm-9">
-                <select class="form-control" ng-model="version" ng-options="v for v in versions">
-                    <option value="">Newest</option>
+                <label class="radio-inline">
+                    <input type="radio" ng-model="versionMode" value="LATEST"> Latest Stable
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" ng-model="versionMode" value="SNAPSHOT"> Snapshot
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" ng-model="versionMode" value="SPECIFIC"> Specifically...
+                </label>
+                <select ng-show="versionMode == 'SPECIFIC'" class="form-control" ng-model="spec.version" ng-options="v for v in versions">
+                    <option value="">Choose a version</option>
                 </select>
             </div>
         </div>
@@ -59,7 +65,7 @@
             <label for="inputMotd" class="col-sm-3 control-label">MOTD</label>
             <div class="col-sm-9">
                 <input type="text"
-                       ng-model="motd"
+                       ng-model="spec.motd"
                        class="form-control" id="inputMotd" placeholder="Optional">
                 <span id="inputMotdHelp" class="help-block">Shown below the server name in Play Multiplayer.</span>
             </div>
@@ -69,7 +75,7 @@
             <label for="inputServerIcon" class="col-sm-3 control-label">Server Icon</label>
             <div class="col-sm-9">
                 <input type="url"
-                       ng-model="serverIcon"
+                       ng-model="spec.serverIcon"
                        class="form-control" id="inputServerIcon" placeholder="Optional">
                 <span id="inputServerIconHelp" class="help-block">URL of an image that will be grabbed and resized.</span>
             </div>
@@ -79,7 +85,7 @@
             <label for="inputLevelSeed" class="col-sm-3 control-label">Level Seed</label>
             <div class="col-sm-9">
                 <input type="text"
-                       ng-model="levelSeed"
+                       ng-model="spec.levelSeed"
                        class="form-control" id="inputLevelSeed" placeholder="Optional">
             </div>
         </div>
@@ -89,5 +95,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default" ng-click="$dismiss()">Nope, changed my mind</button>
-    <button type="button" class="btn btn-primary">Create Server</button>
+    <button type="button" class="btn btn-primary" ng-disabled="createServer.$invalid">Create Server</button>
 </div>
