@@ -60,6 +60,11 @@
             <artifactId>angular-ui-bootstrap</artifactId>
             <version>0.12.1-1</version>
         </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>angular-moment</artifactId>
+            <version>0.9.0</version>
+        </dependency>
     </dependencies>
 
     <build>

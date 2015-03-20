@@ -1,6 +1,7 @@
 angular.module('mccyApp', [
     'ngRoute',
     'ui.bootstrap',
+    'angularMoment',
     'mccyControllers',
     'mccyServices'
 ])

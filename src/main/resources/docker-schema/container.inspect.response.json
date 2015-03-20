@@ -124,7 +124,8 @@
     },
     "Created": {
       "id": "Created",
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
     "Driver": {
       "id": "Driver",

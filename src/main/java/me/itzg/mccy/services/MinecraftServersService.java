@@ -6,6 +6,7 @@ import me.itzg.docker.types.ContainerInspectResponse;
 import me.itzg.docker.types.ContainersResponse;
 import me.itzg.docker.types.Ports;
 import me.itzg.docker.types.PortsProperty;
+import me.itzg.docker.types.State;
 import me.itzg.mccy.MccyClientException;
 import me.itzg.mccy.MccyConstants;
 import me.itzg.mccy.MccyException;
@@ -93,13 +94,32 @@ public class MinecraftServersService {
         MinecraftServerDetails details = new MinecraftServerDetails();
         details.setDockerDaemonId(dockerHost.getDockerDaemonId());
         details.setId(response.getId());
-        details.setContainerStatus(ContainerStatus.fromContainerInspect(response.getState()));
+        extractContainerStatus(response, details);
 
         details.setContainerName(extractContainerName(response));
         details.setExposedPort(extractExposedPort(response));
         extractEnvVarConfiguration(response, details);
 
         return details;
+    }
+
+    private void extractContainerStatus(ContainerInspectResponse response, MinecraftServerDetails details) {
+        final State state = response.getState();
+        final ContainerStatus containerStatus = ContainerStatus.fromContainerInspect(state);
+
+        details.setContainerStatus(containerStatus);
+
+        //TODO: after upgrading Jackson > 2.4.5 need to try the "format":"date-time" again
+
+        switch (containerStatus) {
+            case RUNNING:
+                details.setLastStatusChange(state.getStartedAt());
+                break;
+
+            case EXITED:
+                details.setLastStatusChange(state.getFinishedAt());
+                break;
+        }
     }
 
     private void extractEnvVarConfiguration(ContainerInspectResponse response, MinecraftServerDetails details) throws MccyException {
