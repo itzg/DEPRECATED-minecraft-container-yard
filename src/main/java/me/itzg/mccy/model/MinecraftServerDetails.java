@@ -14,6 +14,8 @@ public class MinecraftServerDetails extends MinecraftServer {
 
     private String containerName;
 
+    private String hostAddress;
+
     private Integer exposedPort;
 
     private ContainerStatus containerStatus;
@@ -35,6 +37,8 @@ public class MinecraftServerDetails extends MinecraftServer {
     private String[] originalOps;
 
     private String iconUrl;
+
+    private String hostDataMount;
 
     public String getRequestedVersion() {
         return requestedVersion;
@@ -138,5 +142,21 @@ public class MinecraftServerDetails extends MinecraftServer {
 
     public void setLastStatusChange(String lastStatusChange) {
         this.lastStatusChange = lastStatusChange;
+    }
+
+    public String getHostDataMount() {
+        return hostDataMount;
+    }
+
+    public void setHostDataMount(String hostDataMount) {
+        this.hostDataMount = hostDataMount;
+    }
+
+    public String getHostAddress() {
+        return hostAddress;
+    }
+
+    public void setHostAddress(String hostAddress) {
+        this.hostAddress = hostAddress;
     }
 }

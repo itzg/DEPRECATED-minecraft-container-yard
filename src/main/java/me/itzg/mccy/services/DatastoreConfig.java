@@ -25,6 +25,8 @@ public class DatastoreConfig {
     public Node esNode() {
         final Settings esSettings = ImmutableSettings.settingsBuilder()
                 .put("path.data", path)
+                .put("cluster.routing.allocation.disk.watermark.low", "200mb")
+                .put("cluster.routing.allocation.disk.watermark.high", "100mb")
                 .build();
 
         return NodeBuilder.nodeBuilder()

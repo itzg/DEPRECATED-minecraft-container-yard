@@ -11,6 +11,11 @@ angular.module('mccyServices', [
                     details: true
                 },
                 url: '/servers'
+            },
+
+            create: {
+                method: 'POST',
+                url: '/servers'
             }
         })
     })

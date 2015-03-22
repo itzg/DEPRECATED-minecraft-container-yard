@@ -10,10 +10,8 @@ import org.elasticsearch.indices.IndexMissingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.List;
 
@@ -81,7 +79,7 @@ public class HostsService {
         // Didn't exist, create it
         host = new DockerHost();
         address = MccyConstants.resolveHostAddress(address);
-        host.setIpAddr(address.getHostText());
+        host.setAddress(address.getHostText());
         host.setTcpPort(address.getPort());
         host.setName(infoResponse.getName());
         host.setDockerDaemonId(infoResponse.getID());

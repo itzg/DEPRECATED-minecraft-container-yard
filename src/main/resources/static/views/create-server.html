@@ -3,7 +3,7 @@
     <h4 class="modal-title">Create a Minecraft Server</h4>
 </div>
 <div class="modal-body">
-    <form name="createServer" class="form-horizontal" show-validation>
+    <form ng-submit="goCreateServer()" name="createServer" class="form-horizontal" show-validation>
 
         <div class="form-group">
             <label for="inputHost" class="col-sm-3 control-label">Docker Host</label>
@@ -62,6 +62,15 @@
         </div>
 
         <div class="form-group">
+            <label for="inputOps" class="col-sm-3 control-label">Ops</label>
+            <div class="col-sm-9">
+                <input type="text"
+                       ng-model="spec.ops"
+                       class="form-control" id="inputOps" placeholder="Optional, comma separated user names">
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="inputMotd" class="col-sm-3 control-label">MOTD</label>
             <div class="col-sm-9">
                 <input type="text"
@@ -95,5 +104,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default" ng-click="$dismiss()">Nope, changed my mind</button>
-    <button type="button" class="btn btn-primary" ng-disabled="createServer.$invalid">Create Server</button>
+    <button type="button" class="btn btn-primary" ng-click="goCreateServer()" ng-disabled="createServer.$invalid">Create Server</button>
 </div>

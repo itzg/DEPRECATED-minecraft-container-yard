@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "/",
+  "id": "/containers/(id)/json",
   "type": "object",
   "properties": {
     "AppArmorProfile": {
@@ -149,7 +149,12 @@
       "properties": {
         "Binds": {
           "id": "Binds",
-          "type": "null"
+          "type": "array",
+
+          "items": {
+            "description": "Colon separated value denoting hostPath:containerPath",
+            "type": "string"
+          }
         },
         "CapAdd": {
           "id": "CapAdd",

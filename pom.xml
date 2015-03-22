@@ -84,6 +84,7 @@
                     <outputDirectory>${project.build.directory}/generated-sources/json-schema</outputDirectory>
                     <useCommonsLang3>true</useCommonsLang3>
                     <useLongIntegers>true</useLongIntegers>
+                    <generateBuilders>true</generateBuilders>
                 </configuration>
                 <executions>
                     <execution>

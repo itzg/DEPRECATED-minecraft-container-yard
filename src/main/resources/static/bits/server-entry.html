@@ -12,8 +12,11 @@
                 <dt ng-if="server.containerStatus == 'EXITED'">Stopped Since</dt>
                 <dd ng-if="server.containerStatus == 'RUNNING' || server.containerStatus == 'EXITED'">{{server.lastStatusChange | amCalendar}}</dd>
 
-                <dt>Port</dt>
-                <dd>{{server.exposedPort}}</dd>
+                <dt>Server Address</dt>
+                <dd>{{renderServerAddress(server)}}</dd>
+
+                <dt>Data Attachment</dt>
+                <dd>{{server.hostDataMount}}</dd>
 
                 <dt>Requested Version</dt>
                 <dd>{{server.requestedVersion}}</dd>

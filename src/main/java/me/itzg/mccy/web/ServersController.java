@@ -3,6 +3,7 @@ package me.itzg.mccy.web;
 import me.itzg.mccy.MccyClientException;
 import me.itzg.mccy.MccyException;
 import me.itzg.mccy.MccyServerException;
+import me.itzg.mccy.model.CreateServerRequest;
 import me.itzg.mccy.model.DockerHost;
 import me.itzg.mccy.model.MinecraftServer;
 import me.itzg.mccy.model.MinecraftServerDetails;
@@ -10,11 +11,13 @@ import me.itzg.mccy.services.HostsService;
 import me.itzg.mccy.services.MinecraftServersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,5 +52,16 @@ public class ServersController {
         final DockerHost dockerHost = dockerHosts.iterator().next();
 
         return serversService.getDetails(dockerHost, serverId);
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public MinecraftServer createServer(@Valid @RequestBody CreateServerRequest request) throws MccyException {
+        final String hostId = request.getHostId();
+        final DockerHost dockerHost = hostsService.get(hostId);
+        if (dockerHost == null) {
+            throw new MccyClientException("Given Docker hostId is not known: " + hostId);
+        }
+
+        return serversService.createServer(dockerHost, request);
     }
 }

@@ -29,9 +29,13 @@ angular.module('mccyControllers', [
         $scope.managing = false;
 
         $scope.createServer = function() {
-            $modal.open({
+            var modalObj = $modal.open({
                 templateUrl: '/views/create-server.html',
                 controller: 'CreateServerController'
+            });
+
+            modalObj.result.then(function() {
+                refresh();
             });
         };
 
@@ -40,16 +44,26 @@ angular.module('mccyControllers', [
                 case 'RUNNING':
                     return 'label-success';
                 case 'EXITED':
+                case 'CREATED':
                     return 'label-danger';
                 default:
                     return 'label-warning';
             }
         };
 
+        $scope.renderServerAddress = function(server) {
+            if (server.exposedPort) {
+                return server.hostAddress + ":" + server.exposedPort;
+            }
+            else {
+                return "";
+            }
+        }
+
         var hosts;
 
         $scope.refresh = function() {
-            $rootScope.$broadcast('refresh', 'servers');
+            refresh();
         };
 
         $scope.$on('refresh', function(evt, target) {
@@ -63,6 +77,10 @@ angular.module('mccyControllers', [
             hosts = selection;
             $scope.$broadcast('refresh', 'servers');
         })
+
+        function refresh() {
+            $rootScope.$broadcast('refresh', 'servers');
+        }
     })
 
     .controller('HostsController', function($scope, $rootScope, Hosts){
@@ -88,7 +106,7 @@ angular.module('mccyControllers', [
         }
     })
 
-    .controller('CreateServerController', function($scope, $modalInstance, Versions, Hosts){
+    .controller('CreateServerController', function($scope, $modalInstance, Versions, Hosts, Servers){
 
         $scope.versionMode = 'LATEST';
         $scope.spec = {
@@ -97,7 +115,10 @@ angular.module('mccyControllers', [
             port: 25565,
             version: 'LATEST',
             type: 'VANILLA',
+            ops: '',
             motd: '',
+            useHostDataMount: false,
+            uid: null,
             serverIcon: null,
             levelSeed: null
         };
@@ -116,6 +137,12 @@ angular.module('mccyControllers', [
         }, function(data){
             console.log("Got", data);
         });
+
+        $scope.goCreateServer = function() {
+            Servers.create($scope.spec, function() {
+                $modalInstance.close(true);
+            });
+        };
 
         $scope.$watch('versionMode', function(newValue) {
             if (newValue != 'SPECIFIC') {
