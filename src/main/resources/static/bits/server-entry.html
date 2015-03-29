@@ -8,9 +8,8 @@
                 <dd><span class="label" ng-class="getLabelClassForStatus(server.containerStatus)">{{server.containerStatus}}</span>
                 </dd>
 
-                <dt ng-if="server.containerStatus == 'RUNNING'">Started At</dt>
-                <dt ng-if="server.containerStatus == 'EXITED'">Stopped Since</dt>
-                <dd ng-if="server.containerStatus == 'RUNNING' || server.containerStatus == 'EXITED'">{{server.lastStatusChange | amCalendar}}</dd>
+                <dt>{{getStatusLabel(server)}}</dt>
+                <dd>{{server.lastStatusChange | amCalendar}}</dd>
 
                 <dt>Server Address</dt>
                 <dd>{{renderServerAddress(server)}}</dd>

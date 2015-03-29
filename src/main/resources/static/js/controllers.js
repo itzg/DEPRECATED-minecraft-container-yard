@@ -58,7 +58,18 @@ angular.module('mccyControllers', [
             else {
                 return "";
             }
-        }
+        };
+
+        $scope.getStatusLabel = function(server) {
+            switch (server.containerStatus) {
+                case 'EXITED':
+                case 'RESTARTING':
+                    return 'Stopped';
+
+                default:
+                    return 'Started';
+            }
+        };
 
         var hosts;
 
@@ -122,6 +133,7 @@ angular.module('mccyControllers', [
             serverIcon: null,
             levelSeed: null
         };
+        $scope.alerts = [];
 
         $scope.hosts = Hosts.getAll(function(response) {
             if (angular.isArray(response)) {
@@ -141,8 +153,14 @@ angular.module('mccyControllers', [
         $scope.goCreateServer = function() {
             Servers.create($scope.spec, function() {
                 $modalInstance.close(true);
+            }, function(httpResponse) {
+                $scope.alerts.push({type:'danger', msg:httpResponse.statusText+':'+httpResponse.data.message})
             });
         };
+
+        $scope.closeAlert = function(index) {
+            $scope.alerts.splice(index, 1);
+        }
 
         $scope.$watch('versionMode', function(newValue) {
             if (newValue != 'SPECIFIC') {

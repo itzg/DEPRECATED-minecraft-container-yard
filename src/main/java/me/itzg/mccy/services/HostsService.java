@@ -5,6 +5,7 @@ import me.itzg.docker.types.InfoResponse;
 import me.itzg.mccy.MccyClientException;
 import me.itzg.mccy.MccyConstants;
 import me.itzg.mccy.MccyException;
+import me.itzg.mccy.docker.DockerClientService;
 import me.itzg.mccy.model.DockerHost;
 import org.elasticsearch.indices.IndexMissingException;
 import org.slf4j.Logger;

@@ -1,6 +1,7 @@
 package me.itzg.mccy.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.itzg.mccy.docker.DockerClientService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,8 +11,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,5 +46,10 @@ public class ServicesConfig {
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
+    }
+
+    @Bean
+    public DockerClientService dockerClientService() {
+        return new DockerClientService(dockerRestTemplate());
     }
 }

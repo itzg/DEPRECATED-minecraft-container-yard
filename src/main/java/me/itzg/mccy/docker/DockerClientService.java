@@ -1,4 +1,4 @@
-package me.itzg.mccy.services;
+package me.itzg.mccy.docker;
 
 import com.google.common.base.Preconditions;
 import com.google.common.net.HostAndPort;
@@ -42,12 +42,14 @@ import java.util.concurrent.Callable;
  * @author Geoff Bourne
  * @since 3/8/2015
  */
-@Service
 public class DockerClientService {
 
-    @Autowired
-    @Qualifier("docker")
     private RestTemplate restTemplate;
+
+    @Autowired
+    public DockerClientService(@Qualifier("docker") RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public static ContainerStatus fromContainerInspect(State inspectedState) {
         if (Boolean.TRUE.equals(inspectedState.getRunning())) {

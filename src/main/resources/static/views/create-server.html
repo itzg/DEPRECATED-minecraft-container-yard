@@ -3,6 +3,9 @@
     <h4 class="modal-title">Create a Minecraft Server</h4>
 </div>
 <div class="modal-body">
+    <div class="alerts">
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+    </div>
     <form ng-submit="goCreateServer()" name="createServer" class="form-horizontal" show-validation>
 
         <div class="form-group">
