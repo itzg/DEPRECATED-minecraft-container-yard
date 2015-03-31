@@ -23,14 +23,16 @@ public class StartupService implements CommandLineRunner {
     private HostsService hostsService;
 
     @Override
-    public void run(String... hostAddrs) throws Exception {
+    public void run(String... args) throws Exception {
         List<MccyException> issues = new ArrayList<>();
 
-        for (String hostAddr : hostAddrs) {
-            try {
-                hostsService.create(HostAndPort.fromString(hostAddr));
-            } catch (MccyException e) {
-                issues.add(e);
+        for (String arg : args) {
+            if (!arg.startsWith("--")) {
+                try {
+                    hostsService.create(HostAndPort.fromString(arg));
+                } catch (MccyException e) {
+                    issues.add(e);
+                }
             }
         }
 

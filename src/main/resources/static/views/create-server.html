@@ -107,5 +107,5 @@
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default" ng-click="$dismiss()">Nope, changed my mind</button>
-    <button type="button" class="btn btn-primary" ng-click="goCreateServer()" ng-disabled="createServer.$invalid">Create Server</button>
+    <button type="button" class="btn btn-primary" ng-click="goCreateServer()" ng-disabled="inProgress || createServer.$invalid">Create Server</button>
 </div>

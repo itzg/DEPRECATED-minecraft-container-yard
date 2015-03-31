@@ -1,40 +1,49 @@
 package me.itzg.mccy.docker;
 
-import com.google.common.base.Preconditions;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HostAndPort;
+import me.itzg.docker.types.InfoResponse;
 import me.itzg.docker.types.containers.ContainersResponse;
 import me.itzg.docker.types.containers.create.ContainersCreateRequest;
 import me.itzg.docker.types.containers.create.ContainersCreateResponse;
 import me.itzg.docker.types.containers.inspect.ContainersInspectResponse;
-import me.itzg.docker.types.InfoResponse;
 import me.itzg.docker.types.containers.inspect.State;
+import me.itzg.docker.types.images.ImagesCreateResponse;
 import me.itzg.mccy.MccyClientException;
 import me.itzg.mccy.MccyConstants;
 import me.itzg.mccy.MccyException;
 import me.itzg.mccy.MccyServerException;
-import me.itzg.mccy.docker.ContainerStatus;
-import me.itzg.mccy.docker.ContainersOptions;
-import me.itzg.mccy.docker.CreateContainerOptions;
-import me.itzg.mccy.docker.DockerClientException;
 import me.itzg.utils.collections.MapBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Wraps/abstract Docker client access around HTTP or some pre-rolled library
@@ -43,12 +52,17 @@ import java.util.concurrent.Callable;
  * @since 3/8/2015
  */
 public class DockerClientService {
+    private static Logger LOG = LoggerFactory.getLogger(DockerClientService.class);
+
+    private static final int MAX_PULL_CREATE_ATTEMPTS = 5;
 
     private RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public DockerClientService(@Qualifier("docker") RestTemplate restTemplate) {
+    public DockerClientService(@Qualifier("docker") RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public static ContainerStatus fromContainerInspect(State inspectedState) {
@@ -140,25 +154,108 @@ public class DockerClientService {
                                                     final ContainersCreateRequest request,
                                                     final CreateContainerOptions options) throws DockerClientException {
 
-        final Map<String, String> variables = new HashMap<>();
-        variables.put("host", dockerHostAndPort.getHostText());
-        variables.put("port", Integer.toString(dockerHostAndPort.getPortOrDefault(MccyConstants.DEFAULT_DOCKER_PORT)));
-        if (options.getName() != null) {
-            variables.put("name", options.getName());
+        int pullCreateAttempts = MAX_PULL_CREATE_ATTEMPTS;
+
+        if (options.isPullLatestRequested()) {
+            LOG.debug("Pulling latest requested");
+            pullImage(dockerHostAndPort, new CreateImageOptions(request.getImage()), null);
         }
 
-        return wrapRestTemplateCall("Creating container", new Callable<ContainersCreateResponse>() {
-            @Override
-            public ContainersCreateResponse call() throws Exception {
-                final URI uri = buildUri(dockerHostAndPort, "/containers/create", null,
-                        "name", options.getName());
+        while (pullCreateAttempts-- > 0) {
+            try {
+                return wrapRestTemplateCall("Creating container", new Callable<ContainersCreateResponse>() {
+                    @Override
+                    public ContainersCreateResponse call() throws Exception {
+                        final URI uri = buildUri(dockerHostAndPort, "/containers/create", null,
+                                "name", options.getName());
 
-                return restTemplate.postForObject(uri, request,
-                        ContainersCreateResponse.class);
+                        return restTemplate.postForObject(uri, request,
+                                ContainersCreateResponse.class);
+                    }
+                });
+            } catch (DockerClientException e) {
+                final HttpClientErrorException httpException = (HttpClientErrorException) e.getCause();
+                if (httpException.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+                    LOG.debug("Image not found, so issuing a pull");
+                    pullImage(dockerHostAndPort, new CreateImageOptions(request.getImage()), null);
+                }
             }
-        });
+        }
+
+        throw new DockerClientException("Unable to pull image/create container after "+MAX_PULL_CREATE_ATTEMPTS+" tries");
     }
 
+    public List<ImagesCreateResponse> pullImage(HostAndPort dockerHostAndPort, final CreateImageOptions options, PullImageListener listener) throws DockerClientException {
+        checkArgument(options != null, "createImageOptions is required");
+        checkArgument(options.getFromImage() != null, "fromImage option is required");
+
+        final PullImageListener resolvedListener = listener != null ? listener : new PullImageListener() {
+            @Override
+            public void handlePullImageProgress(ImagesCreateResponse progress) {
+                LOG.debug("Pull progressing: {}", progress);
+            }
+
+            @Override
+            public void handlePullException(Exception e) {
+                LOG.warn("Issue while pulling", e);
+            }
+
+            @Override
+            public void handlePullFinished(CreateImageOptions options) {
+                LOG.debug("Pull of {} is finished", options);
+            }
+        };
+
+        final URI uri = buildUri(dockerHostAndPort, "/images/create", null,
+                "fromImage", options.getFromImage(),
+                "fromSrc", options.getFromSrc(),
+                "repo", options.getRepo(),
+                "tag", options.getTag(),
+                "registry", options.getRegistry());
+
+        objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
+
+        return wrapRestTemplateCall("Pulling image", new Callable<List<ImagesCreateResponse>>() {
+            @Override
+            public List<ImagesCreateResponse> call() throws Exception {
+
+                return restTemplate.execute(uri.toURL().toString(), HttpMethod.POST, null, new ResponseExtractor<List<ImagesCreateResponse>>() {
+                    @Override
+                    public List<ImagesCreateResponse> extractData(ClientHttpResponse httpResponse) throws IOException {
+                        List<ImagesCreateResponse> responses = new ArrayList<ImagesCreateResponse>();
+
+                        try {
+                            final InputStream in = httpResponse.getBody();
+                            ImagesCreateResponse response;
+                            while ((response = objectMapper.readValue(in, ImagesCreateResponse.class)) != null) {
+                                    resolvedListener.handlePullImageProgress(response);
+
+                            }
+                        } catch (JsonMappingException e) {
+                            if (e.getMessage().contains("end")) {
+                                resolvedListener.handlePullFinished(options);
+                            } else {
+                                resolvedListener.handlePullException(e);
+                            }
+                        }
+
+                        return responses;
+                    }
+                });
+
+            }
+        });
+
+    }
+
+    /**
+     *
+     * @param dockerHostAndPort
+     * @param pathTemplate a path template that optionally contains variable placeholders
+     * @param pathVariables if not null, specifies variables to expand within the <code>pathTemplate</code>
+     * @param queryParams pairs of query parameter name, values where values of null will be skipped
+     * @return
+     */
     private static URI buildUri(HostAndPort dockerHostAndPort, String pathTemplate, Map<String,?> pathVariables,
                                 String... queryParams) {
         final UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
@@ -168,7 +265,9 @@ public class DockerClientService {
                 .path(pathTemplate);
 
         for (int i = 0; i+1 < queryParams.length; i += 2) {
-            uriComponentsBuilder.queryParam(queryParams[i], queryParams[i+1]);
+            if (queryParams[i+1] != null) {
+                uriComponentsBuilder.queryParam(queryParams[i], queryParams[i+1]);
+            }
         }
 
         final UriComponents built = uriComponentsBuilder.build();
@@ -177,7 +276,7 @@ public class DockerClientService {
     }
 
     public void startContainer(HostAndPort dockerHostAndPort, String containerId) throws DockerClientException {
-        Preconditions.checkArgument(containerId != null, "containerId is required");
+        checkArgument(containerId != null, "containerId is required");
 
         final Map<String, Object> variables = MapBuilder.<String,Object>startMap()
                 .put("host", dockerHostAndPort.getHostText())

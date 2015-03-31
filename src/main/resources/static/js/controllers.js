@@ -151,10 +151,15 @@ angular.module('mccyControllers', [
         });
 
         $scope.goCreateServer = function() {
+            $scope.inProgress = true;
+            $scope.alerts.push({type:'info', msg:'Pulling image and creating server'})
+
             Servers.create($scope.spec, function() {
                 $modalInstance.close(true);
             }, function(httpResponse) {
                 $scope.alerts.push({type:'danger', msg:httpResponse.statusText+':'+httpResponse.data.message})
+            }).$promise.finally(function() {
+                $scope.inProgress = false;
             });
         };
 

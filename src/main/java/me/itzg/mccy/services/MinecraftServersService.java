@@ -22,6 +22,7 @@ import me.itzg.mccy.docker.ContainerStatus;
 import me.itzg.mccy.docker.ContainersOptions;
 import me.itzg.mccy.docker.CreateContainerOptions;
 import me.itzg.mccy.docker.DockerClientException;
+import me.itzg.mccy.docker.DockerClientService;
 import me.itzg.mccy.docker.DockerModelUtils;
 import me.itzg.mccy.docker.ImageReference;
 import me.itzg.mccy.model.CreateServerRequest;
@@ -146,7 +147,8 @@ public class MinecraftServersService {
                 .withTty(true);
 
         CreateContainerOptions containerOptions = new CreateContainerOptions()
-                .withName(request.getName());
+                .withName(request.getName())
+                .withPullLatest(request.isPullLatest());
 
 
         try {

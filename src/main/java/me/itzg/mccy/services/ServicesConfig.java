@@ -50,6 +50,6 @@ public class ServicesConfig {
 
     @Bean
     public DockerClientService dockerClientService() {
-        return new DockerClientService(dockerRestTemplate());
+        return new DockerClientService(dockerRestTemplate(), objectMapper());
     }
 }

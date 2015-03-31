@@ -38,6 +38,8 @@ public class CreateServerRequest {
 
     private String levelSeed;
 
+    private boolean pullLatest = true;
+
     public String getHostId() {
         return hostId;
     }
@@ -128,5 +130,13 @@ public class CreateServerRequest {
      */
     public void setOps(String ops) {
         this.ops = ops;
+    }
+
+    public boolean isPullLatest() {
+        return pullLatest;
+    }
+
+    public void setPullLatest(boolean pullLatest) {
+        this.pullLatest = pullLatest;
     }
 }
