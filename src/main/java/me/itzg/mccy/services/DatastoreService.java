@@ -56,6 +56,11 @@ public class DatastoreService {
         }
     }
 
+    /**
+     *
+     * @param hostIds if not null, get the known details of those host IDs, otherwise get all host details
+     * @return
+     */
     public Collection<DockerHost> getAll(List<String> hostIds) {
         final SearchRequestBuilder searchBuilder = esClient.prepareSearch()
                 .setIndices(Index.NAME);

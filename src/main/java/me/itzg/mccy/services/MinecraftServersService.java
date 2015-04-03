@@ -41,12 +41,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Manages access and creation of Minecraft servers.
+ *
  * @author Geoff Bourne
  * @since 3/13/2015
  */
@@ -57,30 +57,35 @@ public class MinecraftServersService {
     @Autowired
     private DockerClientService dockerClientService;
 
+    @Autowired
+    private ImageTrackerService imageTrackerService;
+
     public Collection<MinecraftServer> getServersOnHost(DockerHost dockerHost, boolean allContainers) {
         final ContainersOptions options = new ContainersOptions();
+        final HostAndPort dockerHostAndPort = extractDockerHostAndPort(dockerHost);
+
         options.setShowAll(allContainers);
         Collection<ContainersResponse> containers = dockerClientService.getContainers(
-                extractDockerHostAndPort(dockerHost), options);
+                dockerHostAndPort, options);
 
         List<MinecraftServer> servers = new ArrayList<>();
 
         for (ContainersResponse container : containers) {
             final ImageReference imageReference = ImageReference.fromIdentifier(container.getImage());
 
-            if (imageReference.getImage().equals(MccyConstants.MC_DOCKER_IMAGE)) {
-                final MinecraftServer minecraftServer = new MinecraftServer();
-                minecraftServer.setId(container.getId());
-                minecraftServer.setDockerDaemonId(dockerHost.getDockerDaemonId());
-                servers.add(minecraftServer);
+            try {
+                if (imageTrackerService.isMinecraftServerImage(dockerHostAndPort, container.getImage())) {
+                    final MinecraftServer minecraftServer = new MinecraftServer();
+                    minecraftServer.setId(container.getId());
+                    minecraftServer.setDockerDaemonId(dockerHost.getDockerDaemonId());
+                    servers.add(minecraftServer);
+                }
+            } catch (DockerClientException e) {
+                LOG.warn("Checking if container is minecraft server image", e);
             }
         }
 
         return servers;
-    }
-
-    private static HostAndPort extractDockerHostAndPort(DockerHost dockerHost) {
-        return HostAndPort.fromParts(dockerHost.getAddress(), dockerHost.getTcpPort());
     }
 
     public Collection<MinecraftServer> getServersOnHosts(Collection<DockerHost> dockerHosts, boolean withDetails, final boolean allContainers) throws MccyException {
@@ -90,8 +95,7 @@ public class MinecraftServersService {
             final Collection<MinecraftServer> summaries = getServersOnHost(dockerHost, allContainers);
             if (!withDetails) {
                 servers.addAll(summaries);
-            }
-            else {
+            } else {
                 for (MinecraftServer summary : summaries) {
                     servers.add(getDetails(dockerHost, summary.getId()));
                 }
@@ -99,6 +103,10 @@ public class MinecraftServersService {
         }
 
         return servers;
+    }
+
+    private static HostAndPort extractDockerHostAndPort(DockerHost dockerHost) {
+        return HostAndPort.fromParts(dockerHost.getAddress(), dockerHost.getTcpPort());
     }
 
     public MinecraftServerDetails getDetails(DockerHost dockerHost, String serverId) throws MccyException {
@@ -156,7 +164,7 @@ public class MinecraftServersService {
                     containersCreateRequest, containerOptions);
 
             if (response.getWarnings() != null && !response.getWarnings().isEmpty()) {
-                throw new MccyClientException("Unable to create container: "+response.getWarnings());
+                throw new MccyClientException("Unable to create container: " + response.getWarnings());
             }
 
             dockerClientService.startContainer(extractDockerHostAndPort(dockerHost), response.getId());
@@ -208,7 +216,7 @@ public class MinecraftServersService {
 
     private void extractEnvVarConfiguration(ContainersInspectResponse response, MinecraftServerDetails details) throws MccyException {
         final List<String> envList = response.getConfig().getEnv();
-        final Map<String, String> envVars = splitEnvVars(envList);
+        final Map<String, String> envVars = DockerModelUtils.splitEnvVars(envList);
 
         final Method[] methods = details.getClass().getMethods();
         for (Method method : methods) {
@@ -224,36 +232,23 @@ public class MinecraftServersService {
                             } catch (IllegalAccessException | InvocationTargetException e) {
                                 throw new MccyServerException(String.format("Unable to invoke %s on %s", method, details));
                             }
-                        }
-                        else if (parameterTypes[0].equals(String[].class)) {
+                        } else if (parameterTypes[0].equals(String[].class)) {
                             final String[] parts = asConfigured.split(MccyConstants.STRING_ARRAY_SEPARATOR);
                             try {
-                                method.invoke(details, (Object)parts);
+                                method.invoke(details, (Object) parts);
                             } catch (IllegalAccessException | InvocationTargetException e) {
                                 throw new MccyServerException(String.format(
                                         "Unable to pass %s to invoke %s on %s", Arrays.toString(parts), method, details));
                             }
-                        }
-                        else {
+                        } else {
                             LOG.warn("Setter method had wrong signature: {}", method);
                         }
-                    }
-                    else {
+                    } else {
                         LOG.warn("Setter method had wrong signature: {}", method);
                     }
                 }
             }
         }
-    }
-
-    private Map<String, String> splitEnvVars(List<String> envList) {
-        Map<String, String> asMap = new HashMap<>();
-
-        for (String envVarValue : envList) {
-            final String[] parts = envVarValue.split("=", 2);
-            asMap.put(parts[0], parts[1]);
-        }
-        return asMap;
     }
 
     private Integer extractExposedPort(ContainersInspectResponse response) {
@@ -275,8 +270,7 @@ public class MinecraftServersService {
         final String name = response.getName();
         if (name.startsWith("/")) {
             return name.substring(1, name.length());
-        }
-        else {
+        } else {
             return name;
         }
     }

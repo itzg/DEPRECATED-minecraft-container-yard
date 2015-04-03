@@ -1,0 +1,297 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "/",
+  "type": "object",
+  "properties": {
+    "Architecture": {
+      "id": "Architecture",
+      "type": "string"
+    },
+    "Author": {
+      "id": "Author",
+      "type": "string"
+    },
+    "Comment": {
+      "id": "Comment",
+      "type": "string"
+    },
+    "Config": {
+      "id": "Config",
+      "type": "object",
+      "properties": {
+        "AttachStderr": {
+          "id": "AttachStderr",
+          "type": "boolean"
+        },
+        "AttachStdin": {
+          "id": "AttachStdin",
+          "type": "boolean"
+        },
+        "AttachStdout": {
+          "id": "AttachStdout",
+          "type": "boolean"
+        },
+        "Cmd": {
+          "id": "Cmd",
+          "type": "array",
+          "items": {
+            "id": "0",
+            "type": "string"
+          }
+        },
+        "CpuShares": {
+          "id": "CpuShares",
+          "type": "integer"
+        },
+        "Cpuset": {
+          "id": "Cpuset",
+          "type": "string"
+        },
+        "Domainname": {
+          "id": "Domainname",
+          "type": "string"
+        },
+        "Entrypoint": {
+          "id": "Entrypoint",
+          "type": "null"
+        },
+        "Env": {
+          "id": "Env",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExposedPorts": {
+          "id": "ExposedPorts",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "Hostname": {
+          "id": "Hostname",
+          "type": "string"
+        },
+        "Image": {
+          "id": "Image",
+          "type": "string"
+        },
+        "MacAddress": {
+          "id": "MacAddress",
+          "type": "string"
+        },
+        "Memory": {
+          "id": "Memory",
+          "type": "integer"
+        },
+        "MemorySwap": {
+          "id": "MemorySwap",
+          "type": "integer"
+        },
+        "NetworkDisabled": {
+          "id": "NetworkDisabled",
+          "type": "boolean"
+        },
+        "OnBuild": {
+          "id": "OnBuild",
+          "type": "array",
+          "items": []
+        },
+        "OpenStdin": {
+          "id": "OpenStdin",
+          "type": "boolean"
+        },
+        "PortSpecs": {
+          "id": "PortSpecs",
+          "type": "null"
+        },
+        "StdinOnce": {
+          "id": "StdinOnce",
+          "type": "boolean"
+        },
+        "Tty": {
+          "id": "Tty",
+          "type": "boolean"
+        },
+        "User": {
+          "id": "User",
+          "type": "string"
+        },
+        "Volumes": {
+          "id": "Volumes",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "WorkingDir": {
+          "id": "WorkingDir",
+          "type": "string"
+        }
+      }
+    },
+    "Container": {
+      "id": "Container",
+      "type": "string"
+    },
+    "ContainerConfig": {
+      "id": "ContainerConfig",
+      "type": "object",
+      "properties": {
+        "AttachStderr": {
+          "id": "AttachStderr",
+          "type": "boolean"
+        },
+        "AttachStdin": {
+          "id": "AttachStdin",
+          "type": "boolean"
+        },
+        "AttachStdout": {
+          "id": "AttachStdout",
+          "type": "boolean"
+        },
+        "Cmd": {
+          "id": "Cmd",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "CpuShares": {
+          "id": "CpuShares",
+          "type": "integer"
+        },
+        "Cpuset": {
+          "id": "Cpuset",
+          "type": "string"
+        },
+        "Domainname": {
+          "id": "Domainname",
+          "type": "string"
+        },
+        "Entrypoint": {
+          "id": "Entrypoint",
+          "type": "null"
+        },
+        "Env": {
+          "id": "Env",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExposedPorts": {
+          "id": "ExposedPorts",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "Hostname": {
+          "id": "Hostname",
+          "type": "string"
+        },
+        "Image": {
+          "id": "Image",
+          "type": "string"
+        },
+        "MacAddress": {
+          "id": "MacAddress",
+          "type": "string"
+        },
+        "Memory": {
+          "id": "Memory",
+          "type": "integer"
+        },
+        "MemorySwap": {
+          "id": "MemorySwap",
+          "type": "integer"
+        },
+        "NetworkDisabled": {
+          "id": "NetworkDisabled",
+          "type": "boolean"
+        },
+        "OnBuild": {
+          "id": "OnBuild",
+          "type": "array",
+          "items": []
+        },
+        "OpenStdin": {
+          "id": "OpenStdin",
+          "type": "boolean"
+        },
+        "PortSpecs": {
+          "id": "PortSpecs",
+          "type": "null"
+        },
+        "StdinOnce": {
+          "id": "StdinOnce",
+          "type": "boolean"
+        },
+        "Tty": {
+          "id": "Tty",
+          "type": "boolean"
+        },
+        "User": {
+          "id": "User",
+          "type": "string"
+        },
+        "Volumes": {
+          "id": "Volumes",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "WorkingDir": {
+          "id": "WorkingDir",
+          "type": "string"
+        }
+      }
+    },
+    "Created": {
+      "id": "Created",
+      "type": "string"
+    },
+    "DockerVersion": {
+      "id": "DockerVersion",
+      "type": "string"
+    },
+    "Id": {
+      "id": "Id",
+      "type": "string"
+    },
+    "Os": {
+      "id": "Os",
+      "type": "string"
+    },
+    "Parent": {
+      "id": "Parent",
+      "type": "string"
+    },
+    "Size": {
+      "id": "Size",
+      "type": "integer"
+    },
+    "VirtualSize": {
+      "id": "VirtualSize",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "Architecture",
+    "Author",
+    "Comment",
+    "Config",
+    "Container",
+    "ContainerConfig",
+    "Created",
+    "DockerVersion",
+    "Id",
+    "Os",
+    "Parent",
+    "Size",
+    "VirtualSize"
+  ]
+}

@@ -40,7 +40,7 @@ public class ServersController {
     @RequestMapping(method = RequestMethod.GET)
     public Collection<MinecraftServer> getServers(@RequestParam(value="host", required = false) List<String> hostIds,
                                                   @RequestParam(value="details", required = false, defaultValue = "false") boolean withDetails) throws MccyException {
-        final Collection<DockerHost> hosts = hostsService.getAll(hostIds == null ? Collections.<String>emptyList() : hostIds);
+        final Collection<DockerHost> hosts = hostsService.getAll(hostIds);
 
         return serversService.getServersOnHosts(hosts, withDetails, true);
     }

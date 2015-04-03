@@ -28,6 +28,8 @@ public class MccyConstants {
     public static final String ENV_MODE = "MODE";
     public static final String ENV_MOTD = "MOTD";
     public static final String ENV_LEVEL = "LEVEL";
+    public static final String ENV_MC_IMAGE = "MC_IMAGE";
+    public static final String VAL_YES = "YES";
     public static final String ZERO_ZULU = "0001-01-01T00:00:00Z";
     public static final String DEFAULT_VERSION = "LATEST";
     public static final String DEFAULT_TYPE = "VANILLA";

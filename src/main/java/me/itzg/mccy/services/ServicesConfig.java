@@ -3,6 +3,9 @@ package me.itzg.mccy.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.itzg.mccy.docker.DockerClientService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -19,6 +22,7 @@ import java.util.List;
  * @author Geoff Bourne
  * @since 3/8/2015
  */
+@EnableCaching
 @Configuration
 public class ServicesConfig {
 
@@ -52,4 +56,10 @@ public class ServicesConfig {
     public DockerClientService dockerClientService() {
         return new DockerClientService(dockerRestTemplate(), objectMapper());
     }
+
+    @Bean
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager("imageTracker");
+    }
+
 }

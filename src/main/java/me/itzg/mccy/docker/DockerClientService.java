@@ -11,6 +11,7 @@ import me.itzg.docker.types.containers.create.ContainersCreateResponse;
 import me.itzg.docker.types.containers.inspect.ContainersInspectResponse;
 import me.itzg.docker.types.containers.inspect.State;
 import me.itzg.docker.types.images.ImagesCreateResponse;
+import me.itzg.docker.types.images.ImagesInspectResponse;
 import me.itzg.mccy.MccyClientException;
 import me.itzg.mccy.MccyConstants;
 import me.itzg.mccy.MccyException;
@@ -39,6 +40,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -141,13 +143,23 @@ public class DockerClientService {
 
     public ContainersInspectResponse inspectContainer(HostAndPort dockerHost, String serverId) throws MccyClientException, MccyServerException {
         try {
-            return restTemplate.getForObject("http://{host}:{port}/containers/{serverId}/json", ContainersInspectResponse.class,
-                    dockerHost.getHostText(), dockerHost.getPortOrDefault(MccyConstants.DEFAULT_DOCKER_PORT),
-                    serverId);
+            return restTemplate.getForObject(buildUri(dockerHost, "/containers/{serverId}/json",
+                            Collections.singletonMap("serverId", serverId)),
+                    ContainersInspectResponse.class);
         } catch (RestClientException e) {
             catchRestClientException(e);
             return null;
         }
+    }
+
+    public ImagesInspectResponse inspectImage(final HostAndPort dockerHost, final String imageName) throws DockerClientException {
+        return wrapRestTemplateCall("Inspecting image " + imageName, new Callable<ImagesInspectResponse>() {
+            @Override
+            public ImagesInspectResponse call() throws Exception {
+                return restTemplate.getForObject(buildUri(dockerHost, "/images/{name}/json",
+                        Collections.singletonMap("name", imageName)), ImagesInspectResponse.class);
+            }
+        });
     }
 
     public ContainersCreateResponse createContainer(final HostAndPort dockerHostAndPort,
